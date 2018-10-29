@@ -1,0 +1,4 @@
+Function happens when a nodes constructer function is ran near by.
+on_construct_node_near_by(pos,other_pos)
+Function happens when a nodes destructer function is ran near by.
+on_destruct_node_near_by(pos,other_pos)
