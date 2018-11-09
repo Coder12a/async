@@ -2,8 +2,8 @@ minetest.async = {}
 
 minetest.async.threads = {}
 minetest.async.globalstep_threads = {}
-minetest.async.resting = 200 / 1000
-minetest.async.maxtime = 200 / 1000
+minetest.async.resting = 200
+minetest.async.maxtime = 200
 minetest.async.state = "suspended"
 
 function minetest.async.create_worker(func)
@@ -63,8 +63,8 @@ function minetest.async.schedule_globalstep_worker()
 end
 
 function minetest.async.priority(resting,maxtime)
-	minetest.async.resting = resting / 1000
-	minetest.async.maxtime = maxtime / 1000
+	minetest.async.resting = resting
+	minetest.async.maxtime = maxtime
 end
 
 function minetest.async.iterate(from,to,func,callback)
