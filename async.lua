@@ -68,7 +68,7 @@ function minetest.async.priority(resting,maxtime)
 end
 
 function minetest.async.iterate(from,to,func,callback)
-	minetest.async.create_worker(function(t,mt)
+	minetest.async.create_worker(function()
 		local last_time = minetest.get_us_time() * 1000
 		local maxtime = minetest.async.maxtime
 		for i = from, to do
@@ -104,7 +104,7 @@ function minetest.async.foreach(array, func, callback)
 end
 
 function minetest.async.do_while(condition, func, callback)
-	minetest.async.create_worker(function(t,mt)
+	minetest.async.create_worker(function()
 		local last_time = minetest.get_us_time() * 1000
 		local maxtime = minetest.async.maxtime
 		while(condition) do
@@ -149,7 +149,7 @@ function minetest.async.queue_task(tasks,callback)
 		local pass_arg = {}
 		local last_time = minetest.get_us_time() * 1000
 		local maxtime = minetest.async.maxtime
-		for index, task_func in pairs(tasks) do
+		for task_func, index in pairs(tasks) do
 			local p = task_func(pass_arg)
 			if p then
 				pass_arg = p
