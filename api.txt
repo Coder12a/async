@@ -1,4 +1,18 @@
-Function happens when a nodes constructer function is ran near by.
+-- node_funcs
+-- Function happens when a node's constructer function is ran in a 3x3x3 near by.
 on_construct_node_near_by(pos,other_pos)
-Function happens when a nodes destructer function is ran near by.
+-- Function happens when a node's destructer function is ran 3x3x3 near by.
 on_destruct_node_near_by(pos,other_pos)
+-- async
+--
+minetest.async.priority(resting,maxtime)
+--
+minetest.async.iterate(from,to,func,callback)
+--
+minetest.async.foreach(array, func, callback)
+--
+minetest.async.do_while(condition, func, callback)
+--
+minetest.async.register_globalstep(func)
+--
+minetest.async.queue_task(tasks,callback)
