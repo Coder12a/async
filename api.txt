@@ -5,14 +5,16 @@ on_construct_node_near_by(pos,other_pos)
 on_destruct_node_near_by(pos,other_pos)
 -- async
 --
-minetest.async.priority(resting,maxtime)
+minetest.Async.create_async_pool() --- return pool
 --
-minetest.async.iterate(from,to,func,callback)
+minetest.Async.priority(pool,resting,maxtime)
 --
-minetest.async.foreach(array, func, callback)
+minetest.Async.iterate(pool,from,to,func,callback)
 --
-minetest.async.do_while(condition, func, callback)
+minetest.Async.foreach(pool,array, func, callback)
 --
-minetest.async.register_globalstep(func)
+minetest.Async.do_while(pool,condition_func, func, callback)
 --
-minetest.async.queue_task(tasks,callback)
+minetest.Async.register_globalstep(pool,func)
+--
+minetest.Async.queue_task(pool,tasks,callback)
