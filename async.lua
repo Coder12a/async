@@ -1,7 +1,7 @@
 minetest.Async = {}
 
 function minetest.Async.create_async_pool()
-	local pool = {threads = {},globalstep_threads = {},resting = 200,maxtime = 200,state = "suspended"}
+	local pool = {threads = {},globalstep_threads = {},task_queue = {},resting = 200,maxtime = 200,queue_threads = 8,state = "suspended"}
 	return pool
 end
 
@@ -69,7 +69,10 @@ function minetest.Async.iterate(pool,from,to,func,callback)
 		local last_time = minetest.get_us_time() * 1000
 		local maxtime = pool.maxtime
 		for i = from, to do
-			func(i)
+			local b = func(i)
+			if b and b == false then
+				break
+			end
 			if minetest.get_us_time() * 1000 > last_time + maxtime then
 				coroutine.yield()
 				last_time = minetest.get_us_time() * 1000
@@ -87,7 +90,10 @@ function minetest.Async.foreach(pool,array, func, callback)
 		local last_time = minetest.get_us_time() * 1000
 		local maxtime = pool.maxtime
 		for k,v in ipairs(array) do
-			func(k,v)
+			local b = func(k,v)
+			if b and b == false then
+				break
+			end
 			if minetest.get_us_time() * 1000 > last_time + maxtime then
 				coroutine.yield()
 				last_time = minetest.get_us_time() * 1000
@@ -141,7 +147,7 @@ function minetest.Async.register_globalstep(pool,func)
 	minetest.Async.schedule_globalstep_worker(pool)
 end
 
-function minetest.Async.queue_task(pool,tasks,callback)
+function minetest.Async.chain_task(pool,tasks,callback)
 	minetest.Async.create_worker(pool,function()
 		local pass_arg = {}
 		local last_time = minetest.get_us_time() * 1000
@@ -161,4 +167,38 @@ function minetest.Async.queue_task(pool,tasks,callback)
 		end
 	end)
 	minetest.Async.schedule_worker(pool)
+end
+
+function minetest.Async.queue_task(pool,func,callback)
+	table.insert(pool.task_queue,{func = func,callback = callback})
+	if pool.queue_threads > 0 then
+		pool.queue_threads = pool.queue_threads - 1
+		minetest.Async.create_worker(pool,function()
+			local pass_arg = {}
+			local last_time = minetest.get_us_time() * 1000
+			local maxtime = pool.maxtime
+			while(true) do
+				local task_func = pool.task_queue[1]
+				if task_func and task_func.func then
+					table.remove(pool.task_queue,1)
+					pass_arg = {}
+					local p = task_func.func(pass_arg)
+					if p then
+						pass_arg = p
+					end
+					if task_func.callback then
+						task_func.callback(pass_arg)
+					end
+					if minetest.get_us_time() * 1000 > last_time + maxtime then
+						coroutine.yield()
+						last_time = minetest.get_us_time() * 1000
+					end
+				else
+					pool.queue_threads = pool.queue_threads + 1
+					break
+				end
+			end
+		end)
+		minetest.Async.schedule_worker(pool)
+	end
 end

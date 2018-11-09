@@ -1,20 +1,39 @@
 -- node_funcs
--- Function happens when a node's constructer function is ran in a 3x3x3 near by.
-on_construct_node_near_by(pos,other_pos)
--- Function happens when a node's destructer function is ran 3x3x3 near by.
-on_destruct_node_near_by(pos,other_pos)
+-- Function happens when a node's constructer function is ran near by.
+on_construct_node_near_by(pos,other_pos,name)
+-- Function happens when a node's destructer function is ran near by.
+on_destruct_node_near_by(pos,other_pos,name)
 -- async
---
+-- Create's a async pool.
 minetest.Async.create_async_pool() --- return pool
---
+-- Set the priority of the given async pool.
+-- resting is the delay between resuming threads.
+-- maxtime is how long a thread will work before yield.
 minetest.Async.priority(pool,resting,maxtime)
---
+-- Async for loop.
+-- from is the starting value for the loop.
+-- to is the ending value to will break the loop.
+-- func(i) is the function that is ran in the for loop. func can break the loop if it returns false.
+-- callback() function is ran when the for loop ends. callback can be nil.
 minetest.Async.iterate(pool,from,to,func,callback)
---
+-- Async foreach loop.
+-- array is the list to loop throught.
+-- func(k,v) is the function that is ran in the foreach loop. func can break the loop if it returns false.
+-- callback() function is ran when the foreach loop ends. callback can be nil.
 minetest.Async.foreach(pool,array, func, callback)
---
+-- Async do while loop.
+-- condition_func() returns the condition.
+-- func() is the function that is ran in the do while loop. func can break the loop if it returns false.
+-- callback() function is ran when the do while loop ends. callback can be nil.
 minetest.Async.do_while(pool,condition_func, func, callback)
---
+-- Async globalstep loop. this can never be shutdown like in the minetest version. happens every 0.05 seconds.
+-- func(dtime) is the function that is ran in the globalstep.
 minetest.Async.register_globalstep(pool,func)
---
-minetest.Async.queue_task(pool,tasks,callback)
+-- Async chain task.
+-- tasks is a table of functions that ran in order.
+-- callback() function is ran when the chain_task ends. callback can be nil.
+minetest.Async.chain_task(pool,tasks,callback)
+-- Async task queue.
+-- func is a single function that gets added to the queue list.
+-- callback() function is ran when the queue_task ends. callback can be nil.
+minetest.Async.queue_task(pool,func,callback)

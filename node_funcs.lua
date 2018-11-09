@@ -1,4 +1,3 @@
--- on_construct_node_near_by(pos,constructed_pos)
 local function on_construct_override(pos)
 	local lpos = pos
 	local pos1 = {x=lpos.x-1,y=lpos.y-1,z=lpos.z-1}
@@ -25,6 +24,10 @@ local function on_construct_override(pos)
 	local n2z = pos2.z
 	
     local data = vm:get_data()
+	
+	local m_vi = a:index(nx, ny, nz)
+	local myname = minetest.get_name_from_content_id(data[m_vi])
+	
 	for z = n1z, n2z do
 		for y = n1y, n2y do
 			for x = n1x, n2x do
@@ -33,7 +36,7 @@ local function on_construct_override(pos)
 					local name = minetest.get_name_from_content_id(data[vi])
 					local node = minetest.registered_nodes[name]
 					if node.on_construct_node_near_by then
-						node.on_construct_node_near_by({x=x,y=y,z=z},lpos)
+						node.on_construct_node_near_by({x=x,y=y,z=z},lpos,myname)
 					end
 				end
 			end
@@ -67,6 +70,10 @@ local function on_construct_override2(pos)
 	local n2z = pos2.z
 	
     local data = vm:get_data()
+	
+	local m_vi = a:index(nx, ny, nz)
+	local myname = minetest.get_name_from_content_id(data[m_vi])
+	
 	for z = n1z, n2z do
 		for y = n1y, n2y do
 			for x = n1x, n2x do
@@ -75,7 +82,7 @@ local function on_construct_override2(pos)
 				local node = minetest.registered_nodes[name]
 				if x ~= nx or y ~= ny or z ~= nz then
 					if node.on_construct_node_near_by then
-						node.on_construct_node_near_by({x=x,y=y,z=z},lpos)
+						node.on_construct_node_near_by({x=x,y=y,z=z},lpos,myname)
 					end
 				else
 					node.exa_old_on_construct(lpos)
@@ -86,7 +93,6 @@ local function on_construct_override2(pos)
 end
 -- End
 
--- on_destruct_node_near_by(pos,destructed_pos)
 local function on_destruct_override(pos)
 	local lpos = pos
 	local pos1 = {x=lpos.x-1,y=lpos.y-1,z=lpos.z-1}
@@ -113,6 +119,10 @@ local function on_destruct_override(pos)
 	local n2z = pos2.z
 	
     local data = vm:get_data()
+	
+	local m_vi = a:index(nx, ny, nz)
+	local myname = minetest.get_name_from_content_id(data[m_vi])
+	
 	for z = n1z, n2z do
 		for y = n1y, n2y do
 			for x = n1x, n2x do
@@ -121,7 +131,7 @@ local function on_destruct_override(pos)
 					local name = minetest.get_name_from_content_id(data[vi])
 					local node = minetest.registered_nodes[name]
 					if node.on_destruct_node_near_by then
-						node.on_destruct_node_near_by({x=x,y=y,z=z},lpos)
+						node.on_destruct_node_near_by({x=x,y=y,z=z},lpos,myname)
 					end
 				end
 			end
@@ -155,6 +165,10 @@ local function on_destruct_override2(pos)
 	local n2z = pos2.z
 	
     local data = vm:get_data()
+	
+	local m_vi = a:index(nx, ny, nz)
+	local myname = minetest.get_name_from_content_id(data[m_vi])
+	
 	for z = n1z, n2z do
 		for y = n1y, n2y do
 			for x = n1x, n2x do
@@ -163,7 +177,7 @@ local function on_destruct_override2(pos)
 				local node = minetest.registered_nodes[name]
 				if x ~= nx or y ~= ny or z ~= nz then
 					if node.on_destruct_node_near_by then
-						node.on_destruct_node_near_by({x=x,y=y,z=z},lpos)
+						node.on_destruct_node_near_by({x=x,y=y,z=z},lpos,myname)
 					end
 				else
 					node.exa_old_on_destruct(lpos)
@@ -179,7 +193,7 @@ function()
 	for n, d in pairs(minetest.registered_nodes) do
 	local cn = {}
 	for k,v in pairs(minetest.registered_nodes[n]) do cn[k] = v end
-		-- on_construct_node_near_by(pos,other_pos)
+		-- on_construct_node_near_by(pos,other_pos,name)
 		local on_con = cn.on_construct
 		if on_con then
 			cn.exa_old_on_construct = on_con
@@ -188,7 +202,7 @@ function()
 			on_con = on_construct_override
 		end
 		cn.on_construct = on_con
-		-- on_destruct_node_near_by(pos,other_pos)
+		-- on_destruct_node_near_by(pos,other_pos,name)
 		local on_dis = cn.on_destruct
 		if on_dis then
 			cn.exa_old_on_destruct = on_dis
@@ -196,7 +210,7 @@ function()
 		else
 			on_dis = on_destruct_override
 		end
-		cn.on_destruct = on_con
+		cn.on_destruct = on_dis
 		minetest.register_node(":"..n,cn)
 	end
 end)
