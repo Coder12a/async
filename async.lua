@@ -58,7 +58,7 @@ function minetest.async.schedule_globalstep_worker()
 		minetest.after(0,minetest.async.run_globalstep_worker,index)
 		return true
 	end
-	minetest.after(5,minetest.async.schedule_globalstep_worker)
+	minetest.after(0.05,minetest.async.schedule_globalstep_worker)
 	return false
 end
 
