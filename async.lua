@@ -45,7 +45,7 @@ end
 function minetest.async.schedule_worker()
 	minetest.async.state = "running"
 	for index,value in ipairs(minetest.async.threads) do
-		minetest.after(0,minetest.async.run_worker,index)
+		minetest.after(minetest.async.resting,minetest.async.run_worker,index)
 		return true
 	end
 	minetest.async.state = "suspended"
