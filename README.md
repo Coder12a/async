@@ -1,8 +1,3 @@
-# extended_api
-mod for minetest
-
-This mod adds more functions and features to the minetest api.
-
 extended_api
 ===========
 
@@ -58,14 +53,13 @@ minetest.Async.chain_task(pool,{
 	args.count = args.count + 1
 	minetest.log(args.count)
 	return args
-	end}
-)
+end})
 ```
 8. adds a single function to the task queue. This is a sort of waiting list.
 ```lua
-	minetest.Async.queue_task(pool,function() 
-		minetest.log("Hello World!")
-	end)
+minetest.Async.queue_task(pool,function() 
+	minetest.log("Hello World!")
+end)
 ```
 Usage Node
 ===========
