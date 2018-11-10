@@ -1,1 +1,1 @@
-This mod adds more functions and features to the minetest api.
+This mod is a library that adds more functions and features.
