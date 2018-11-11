@@ -179,8 +179,8 @@ function extended_api.Async.queue_task(pool,func,callback)
 			local maxtime = pool.maxtime
 			while(true) do
 				local task_func = pool.task_queue[1]
+				table.remove(pool.task_queue,1)
 				if task_func and task_func.func then
-					table.remove(pool.task_queue,1)
 					pass_arg = {}
 					local p = task_func.func(pass_arg)
 					if p then
