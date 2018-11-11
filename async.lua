@@ -149,7 +149,7 @@ end
 
 function extended_api.Async.chain_task(pool,tasks,callback)
 	extended_api.Async.create_worker(pool,function()
-		local pass_arg = {}
+		local pass_arg = nil
 		local last_time = minetest.get_us_time() * 1000
 		local maxtime = pool.maxtime
 		for index, task_func in pairs(tasks) do
@@ -174,14 +174,14 @@ function extended_api.Async.queue_task(pool,func,callback)
 	if pool.queue_threads > 0 then
 		pool.queue_threads = pool.queue_threads - 1
 		extended_api.Async.create_worker(pool,function()
-			local pass_arg = {}
+			local pass_arg = nil
 			local last_time = minetest.get_us_time() * 1000
 			local maxtime = pool.maxtime
 			while(true) do
 				local task_func = pool.task_queue[1]
 				table.remove(pool.task_queue,1)
 				if task_func and task_func.func then
-					pass_arg = {}
+					pass_arg = nil
 					local p = task_func.func(pass_arg)
 					if p then
 						pass_arg = p
