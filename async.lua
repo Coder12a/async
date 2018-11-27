@@ -70,7 +70,7 @@ function extended_api.Async.iterate(pool,from,to,func,callback)
 		local maxtime = pool.maxtime
 		for i = from, to do
 			local b = func(i)
-			if b and b == false then
+			if b ~= nil and b == false then
 				break
 			end
 			if minetest.get_us_time() * 1000 > last_time + maxtime then
@@ -91,7 +91,7 @@ function extended_api.Async.foreach(pool,array, func, callback)
 		local maxtime = pool.maxtime
 		for k,v in ipairs(array) do
 			local b = func(k,v)
-			if b and b == false then
+			if b ~= nil and b == false then
 				break
 			end
 			if minetest.get_us_time() * 1000 > last_time + maxtime then
@@ -112,7 +112,7 @@ function extended_api.Async.do_while(pool,condition_func, func, callback)
 		local maxtime = pool.maxtime
 		while(condition_func()) do
 			local c = func()
-			if c and c ~= condition_func() then
+			if c ~= nil and c ~= condition_func() then
 				break
 			end
 			if minetest.get_us_time() * 1000 > last_time + maxtime then
@@ -132,10 +132,7 @@ function extended_api.Async.register_globalstep(pool,func)
 		local last_time = minetest.get_us_time() * 1000
 		local dtime = last_time
 		while(true) do
-			local c = func(dtime)
-			if c and c == false then
-				break
-			end
+			func(dtime)
 			dtime = minetest.get_us_time() * 1000
 			-- 0.05 seconds
 			if minetest.get_us_time() * 1000 > last_time + 50 then
@@ -154,7 +151,7 @@ function extended_api.Async.chain_task(pool,tasks,callback)
 		local maxtime = pool.maxtime
 		for index, task_func in pairs(tasks) do
 			local p = task_func(pass_arg)
-			if p then
+			if p ~= nil then
 				pass_arg = p
 			end
 			if minetest.get_us_time() * 1000 > last_time + maxtime then
@@ -183,7 +180,7 @@ function extended_api.Async.queue_task(pool,func,callback)
 				if task_func and task_func.func then
 					pass_arg = nil
 					local p = task_func.func(pass_arg)
-					if p then
+					if p ~= nil then
 						pass_arg = p
 					end
 					if task_func.callback then
