@@ -6,44 +6,44 @@ It adds two new node events and contains async functions.
 
 Usage Async
 ===========
-1. create a async pool.
+1. create a async instance.
 ```lua
-pool = extended_api.Async.create_async_pool()
+async = extended_api.Async()
 ```
 2. set the priority of the async pool to high.
 ```lua
-extended_api.Async.priority(pool,50,500)
+async.priority(50, 500)
 ```
 3. iterate from 1 to 50 and log the value i.
 ```lua
-extended_api.Async.iterate(pool,1,50,function(i)
+async.iterate(1, 50, function(i)
 	minetest.log(i)
 end)
 ```
 4. run throught each element in a table.
 ```lua
-local array = {"start","text2","text3","text4","text5","end"}
-extended_api.Async.foreach(pool,array, function(k,v)
+local array = {"start", "text2", "text3", "text4", "text5", "end"}
+async.foreach(array, function(k,v)
 	minetest.log(v)
 end)
 ```
 5. async do while loop.
 ```lua
 local c = 50
-extended_api.Async.do_while(pool,function() return c>0 end, function()
+async.do_while(function() return c>0 end, function()
 	minetest.log(c)
 	c = c - 1
 end)
 ```
 6. register a async globalstep. this one spams the chat with the word spam.
 ```lua
-extended_api.Async.register_globalstep(pool,function(dtime) 
+async.register_globalstep(function(dtime) 
 	minetest.chat_send_all("spam")
 end)
 ```
 7. chain task runs a group of functions from a table.
 ```lua
-extended_api.Async.chain_task(pool,{
+async.chain_task({
 	function(args)
 		args.count = 1
 		minetest.log(args.count)
@@ -57,11 +57,17 @@ end})
 ```
 8. adds a single function to the task queue. This is a sort of waiting list.
 ```lua
-extended_api.Async.queue_task(pool,function() 
+async.queue_task(function() 
 	minetest.log("Hello World!")
 end)
 ```
-Usage Node
+9. Same as queue_task but the task does not go into a queue.
+```lua
+async.single_task(function() 
+	minetest.log("Hello World!")
+end)
+```
+New Node Events
 ===========
 1. this covers both functions. I made this for a way to awake node timers without abms.
 ```lua
@@ -83,4 +89,27 @@ minetest.register_node("default:stone", {
 		end
 	end,
 })
+```
+New Registers
+===========
+1. register_playerloop iterates through all players online.
+```lua
+extended_api.register_playerloop(function(dtime, _, player) 
+	-- Empty
+end)
+```
+2. register_step excutes the given function in one minetest globalstep.
+```lua
+extended_api.register_step(function(dtime)
+	minetest.chat_send_all("spam")
+end)
+```
+3. functions on_wield and on_wield_switch happen when a player wields a item.
+```lua
+extended_api.register_on_wield("default:torch", function(item, itemname, player)
+	minetest.chat_send_all("You are wielding " .. itemname) 
+end)
+extended_api.register_on_wield_switch("default:torch", function(item, itemname, player)
+	minetest.chat_send_all("You un-wielded " .. itemname)
+end)
 ```
