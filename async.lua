@@ -27,7 +27,6 @@ function extended_api.Async()
 		local thread = self.pool.threads[index]
 		if not thread or coroutine.status(thread) == "dead" then
 			table.remove(self.pool.threads, index)
-			minetest.after(0, self.schedule_worker)
 			return false
 		else
 			coroutine.resume(thread)
@@ -40,7 +39,6 @@ function extended_api.Async()
 		local thread = self.pool.globalstep_threads[index]
 		if not thread or coroutine.status(thread) == "dead" then
 			table.remove(self.pool.globalstep_threads, index)
-			minetest.after(0, self.schedule_globalstep_worker)
 			return false
 		else
 			coroutine.resume(thread)
@@ -99,7 +97,7 @@ function extended_api.Async()
 			local last_time = minetest.get_us_time() / 1000
 			local maxtime = self.pool.maxtime
 			for k,v in ipairs(array) do
-				local b = func(k,v)
+				local b = func(k, v)
 				if b ~= nil and b == false then
 					break
 				end
