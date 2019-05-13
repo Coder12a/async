@@ -1,1 +1,0 @@
-This mod is a library that adds more functions and features.

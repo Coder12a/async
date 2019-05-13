@@ -1,4 +1,4 @@
-function extended_api.Async()
+function async.Async()
 	local self = {}
 	
 	self.task_queue = {}

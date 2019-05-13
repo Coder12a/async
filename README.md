@@ -1,14 +1,14 @@
-extended_api
+async
 ===========
 
-extended_api mod is a library pack.
+async mod is a library pack.
 It adds two new node events and contains async functions.
 
 Usage Async
 ===========
 1. create a async instance.
 ```lua
-async = extended_api.Async()
+async = async.Async()
 ```
 2. set the priority of the async pool to high.
 ```lua
@@ -65,51 +65,5 @@ end)
 ```lua
 async.single_task(function() 
 	minetest.log("Hello World!")
-end)
-```
-New Node Events
-===========
-1. this covers both functions. I made this for a way to awake node timers without abms.
-```lua
-minetest.register_node("default:stone", {
-	description = "Stone",
-	tiles = {"default_stone.png"},
-	groups = {cracky = 3, stone = 1},
-	drop = 'default:cobble',
-	legacy_mineral = true,
-	sounds = default.node_sound_stone_defaults(),
-	on_construct_node_near_by = function(pos,other_pos,name)
-		if name == "tnt:tnt" then
-			minetest.chat_send_all("Do not place tnt near me thank you!")
-		end
-	end,
-	on_destruct_node_near_by = function(pos,other_pos,name)
-		if name == "default:dirt" then
-			minetest.chat_send_all("I hate dirt too!")
-		end
-	end,
-})
-```
-New Registers
-===========
-1. register_playerloop iterates through all players online.
-```lua
-extended_api.register_playerloop(function(dtime, _, player) 
-	-- Empty
-end)
-```
-2. register_step excutes the given function in one minetest globalstep.
-```lua
-extended_api.register_step(function(dtime)
-	minetest.chat_send_all("spam")
-end)
-```
-3. functions on_wield and on_wield_switch happen when a player wields a item.
-```lua
-extended_api.register_on_wield("default:torch", function(item, itemname, player)
-	minetest.chat_send_all("You are wielding " .. itemname) 
-end)
-extended_api.register_on_wield_switch("default:torch", function(item, itemname, player)
-	minetest.chat_send_all("You un-wielded " .. itemname)
 end)
 ```
