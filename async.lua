@@ -151,7 +151,7 @@ function async.Async()
 	end
 
 	self.queue_task = function(func, callback)
-		table.insert(self.task_queue, {func = func,callback = callback})
+		table.insert(self.task_queue, {func = func, callback = callback})
 		if self.queue_threads > 0 then
 			self.queue_threads = self.queue_threads - 1
 			self.create_worker(function()
@@ -159,8 +159,8 @@ function async.Async()
 				local last_time = minetest.get_us_time() / 1000
 				local maxtime = self.maxtime
 				while(true) do
-					local task_func = self.task_queue[1]
-					table.remove(self.task_queue, 1)
+					local task_func = self.task_queue[#self.task_queue]
+					self.task_queue[#self.task_queue] = nil
 					if task_func and task_func.func then
 						pass_arg = nil
 						local p = task_func.func()
