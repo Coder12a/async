@@ -1,54 +1,53 @@
+local threads = {}
+local time = 0
+minetest.register_globalstep(function(dtime)
+	time = time + dtime
+	if #threads < 1 then
+		return
+	end
+	for i = #threads, 1, -1 do
+		if time >= threads[i].delay then
+			local thread = threads[i].thread
+			local state = coroutine.status(thread)
+			if state == "dead" then
+				table.remove(threads, i)
+			elseif state == "suspended" then
+				coroutine.resume(thread)
+				threads[i].delay = time + threads[i].delaymax
+			end
+		end
+	end
+end)
+
 function async.Async()
 	local self = {}
-	
 	self.task_queue = {}
-	self.resting = 200
 	self.maxtime = 200
 	self.queue_threads = 8
-	self.state = "suspended"
-	
 	self.create_worker = function(func)
 		local thread = coroutine.create(func)
 		if not thread or coroutine.status(thread) == "dead" then
-			minetest.after(0.3, self.create_worker, func)
+			minetest.after(0.5, self.create_worker, func)
 			return
 		end
-		self.run_worker(thread)
+		threads[#threads + 1] = {
+			thread = thread,
+			delay = time + self.maxtime / 1000,
+			delaymax = self.maxtime / 1000
+		}
 	end
-	
 	self.create_globalstep_worker = function(func)
 		local thread = coroutine.create(func)
 		if not thread or coroutine.status(thread) == "dead" then
-			minetest.after(0.3, self.create_globalstep_worker, func)
+			minetest.after(0.5, self.create_globalstep_worker, func)
 			return
 		end
-		self.run_globalstep_worker(thread)
+		threads[#threads + 1] = {
+			thread = thread,
+			delay = time,
+			delaymax = 0
+		}
 	end
-	self.run_worker = function(thread)
-		if not thread or coroutine.status(thread) == "dead" then
-			return false
-		else
-			coroutine.resume(thread)
-			minetest.after(self.resting / 1000, self.run_worker, thread)
-			return true
-		end
-	end
-
-	self.run_globalstep_worker = function(thread)
-		if not thread or coroutine.status(thread) == "dead" then
-			return false
-		else
-			coroutine.resume(thread)
-			minetest.after(0, self.run_globalstep_worker, thread)
-			return true
-		end
-	end
-
-	self.priority = function(resting, maxtime)
-		self.resting = resting
-		self.maxtime = maxtime
-	end
-
 	self.iterate = function(from, to, func, callback)
 		self.create_worker(function()
 			local last_time = minetest.get_us_time() / 1000
@@ -69,13 +68,12 @@ function async.Async()
 			return
 		end)
 	end
-
 	self.foreach = function(array, func, callback)
 		self.create_worker(function()
 			local last_time = minetest.get_us_time() / 1000
 			local maxtime = self.maxtime
 			for k,v in ipairs(array) do
-				local b = func(k,v)
+				local b = func(k, v)
 				if b ~= nil and b == false then
 					break
 				end
@@ -90,7 +88,6 @@ function async.Async()
 			return
 		end)
 	end
-
 	self.do_while = function(condition_func, func, callback)
 		self.create_worker(function()
 			local last_time = minetest.get_us_time() / 1000
@@ -111,7 +108,6 @@ function async.Async()
 			return
 		end)
 	end
-
 	self.register_globalstep = function(func)
 		self.create_globalstep_worker(function()
 			local last_time = minetest.get_us_time() / 1000000
@@ -127,7 +123,6 @@ function async.Async()
 			end
 		end)
 	end
-
 	self.chain_task = function(tasks, callback)
 		self.create_worker(function()
 			local pass_arg = nil
@@ -149,7 +144,6 @@ function async.Async()
 			return
 		end)
 	end
-
 	self.queue_task = function(func, callback)
 		table.insert(self.task_queue, {func = func, callback = callback})
 		if self.queue_threads > 0 then
@@ -182,7 +176,6 @@ function async.Async()
 			end)
 		end
 	end
-
 	self.single_task = function(func, callback)
 		self.create_worker(function()
 			local pass_arg = func()
