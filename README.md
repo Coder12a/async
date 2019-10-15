@@ -27,7 +27,7 @@ end, function() minetest.log("Callback") end)
 5. run throught each element in a table.
 ```lua
 local array = {"start", "text2", "text3", "text4", "text5", "end"}
-async.foreach(array, function(k, v)
+async.foreach(pairs(array), function(k, v)
 	minetest.log(v)
 end, function() minetest.log("Callback") end)
 ```

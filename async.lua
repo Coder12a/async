@@ -68,11 +68,11 @@ function async.Async()
 			return
 		end)
 	end
-	self.foreach = function(array, func, callback)
+	self.foreach = function(_pairs, func, callback)
 		self.create_worker(function()
 			local last_time = minetest.get_us_time() / 1000
 			local maxtime = self.maxtime
-			for k,v in ipairs(array) do
+			for k, v in _pairs do
 				local b = func(k, v)
 				if b ~= nil and b == false then
 					break
